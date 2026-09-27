@@ -31,7 +31,21 @@ liff
     const note = document.createElement('p');
     note.textContent = 'この名前とアイコンは、LINEから受け取ったものです。';
 
-    app.replaceChildren(img, hello, note);
+    const visit = document.createElement('p');
+    visit.textContent = 'サーバーに記録しています…';
+
+    app.replaceChildren(img, hello, note, visit);
+
+    // サーバーには名前ではなくIDトークンを送る。本物かどうかはサーバーがLINEに確かめる
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-and-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken: liff.getIDToken() })
+    });
+    const result = await res.json();
+    visit.textContent = res.ok
+      ? `サーバーがLINEに確かめて記録しました。${result.visits}回目の来訪です。`
+      : `記録できませんでした（${res.status}: ${result.error}）`;
   })
   .catch((error) => {
     document.querySelector('#app').innerHTML = `
