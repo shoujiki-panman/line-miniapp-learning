@@ -48,12 +48,23 @@ liff
       : `記録できませんでした（${res.status}: ${result.error}）`;
   })
   .catch((error) => {
-    document.querySelector('#app').innerHTML = `
-    <h1>create-liff-app</h1>
-    <p>LIFF init failed.</p>
-    <p><code>${error}</code></p>
-    <a href="https://developers.line.biz/ja/docs/liff/" target="_blank" rel="noreferrer">
-      LIFF Documentation
-    </a>
-  `;
+    // エラー文も外から来る文字なので、HTMLとしてではなく文字として入れる
+    const title = document.createElement('h1');
+    title.textContent = 'create-liff-app';
+
+    const failed = document.createElement('p');
+    failed.textContent = 'LIFF init failed.';
+
+    const code = document.createElement('code');
+    code.textContent = String(error);
+    const detail = document.createElement('p');
+    detail.append(code);
+
+    const docs = document.createElement('a');
+    docs.href = 'https://developers.line.biz/ja/docs/liff/';
+    docs.target = '_blank';
+    docs.rel = 'noreferrer';
+    docs.textContent = 'LIFF Documentation';
+
+    app.replaceChildren(title, failed, detail, docs);
   });
