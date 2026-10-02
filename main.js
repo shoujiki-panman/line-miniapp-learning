@@ -40,11 +40,13 @@ liff
     const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-and-log`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: liff.getIDToken() })
+      // アクセストークンは「受付完了」の通知を送るためだけに使う
+      body: JSON.stringify({ idToken: liff.getIDToken(), accessToken: liff.getAccessToken() })
     });
     const result = await res.json();
     visit.textContent = res.ok
-      ? `サーバーがLINEに確かめて記録しました。${result.visits}回目の来訪です。`
+      ? `サーバーがLINEに確かめて記録しました。${result.visits}回目の来訪です。` +
+        (result.notified === 'sent' ? '「LINEミニアプリ お知らせ」に受付完了を送りました。' : '')
       : `記録できませんでした（${res.status}: ${result.error}）`;
   })
   .catch((error) => {
