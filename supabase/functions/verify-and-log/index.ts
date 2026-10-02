@@ -42,9 +42,9 @@ Deno.serve(async (req: Request) => {
   const secretKey = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)['default'];
   const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, secretKey);
 
+  // 表示名は保存しない。記録に要るのはLINEのユーザーIDだけ
   const { error } = await supabaseAdmin.from('visits').insert({
     line_user_id: verified.sub,
-    display_name: verified.name ?? null,
   });
   if (error) {
     return json({ error: 'db insert failed' }, 500);
@@ -55,5 +55,5 @@ Deno.serve(async (req: Request) => {
     .select('*', { count: 'exact', head: true })
     .eq('line_user_id', verified.sub);
 
-  return json({ ok: true, name: verified.name ?? null, visits: count ?? null }, 200);
+  return json({ ok: true, visits: count ?? null }, 200);
 });
